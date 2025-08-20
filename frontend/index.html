@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>FontImageConverter</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Универсальный конвертер</h1>
+      <form class="convert-form" enctype="multipart/form-data">
+        <label for="file">Выберите файл:</label>
+        <input type="file" id="file" name="file" required /><br />
+        <label for="conversion-type">Тип конвертации:</label>
+        <select id="conversion-type" name="conversion_type">
+          <option disabled selected value="">Выберите тип конвертации</option>
+          <optgroup label="Шрифты">
+            <option value="">...</option>
+          </optgroup>
+          <optgroup label="Документы">
+            <option value="">...</option>
+          </optgroup>
+          <optgroup label="Изображения">
+            <option value="png2jpg">PNG → JPG</option>
+            <option value="jpg2png">JPG → PNG</option>
+            <option value="png2webp">PNG → WEBP</option>
+            <option value="jpg2webp">JPG → WEBP</option>
+            <option value="webp2png">WEBP → PNG</option>
+            <option value="webp2jpg">WEBP → JPG</option>
+          </optgroup></select
+        ><br />
+        <button type="submit">Конвертировать</button>
+      </form>
+      <div class="progress" style="display: none">
+        <div class="progress-text">Готовим...</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="result-block"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
