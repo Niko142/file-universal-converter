@@ -9,16 +9,16 @@ def convert_image(file: UploadFile, conversion_type: str) -> Tuple[bytes, str]:
 
     out = io.BytesIO()
 
-    if conversion_type == "png2jpg" or conversion_type == "webp2jpg":
+    if conversion_type in ["png2jpg", "jpg2png"]:
         img = img.convert("RGB")
         img.save(out, format="JPEG")
         return out.getvalue(), "jpg"
 
-    elif conversion_type == "jpg2png" or conversion_type == "webp2png":
+    elif conversion_type in ["jpg2png", "webp2png"]:
         img.save(out, format="PNG")
         return out.getvalue(), "png"
 
-    elif conversion_type == "png2webp" or conversion_type == "jpg2webp":
+    elif conversion_type in ["png2webp", "jpg2webp"]:
         img.save(out, format="WEBP")
         return out.getvalue(), "webp"
 

@@ -34,7 +34,7 @@ body {
   justify-content: center;
 }
 .container {
-  max-width: 420px;
+  max-width: 550px;
   width: 100%;
   background: var(--color-container);
   border-radius: 10px;

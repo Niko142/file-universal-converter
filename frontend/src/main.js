@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector(".convert-form");
   const resultDiv = document.querySelector(".result-block");
   let lastDownloadUrl = null;
+  let lastFileName = null;
 
   form.addEventListener("submit", handleFormSubmit);
 
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
       });
 
-      // Проверяем Content-Type перед обработкой
+      // Проверка Content-Type перед обработкой
       const contentType = response.headers.get("content-type") || "";
 
       if (!response.ok) {
@@ -40,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Если это HTML ошибка (по умолчанию от FastAPI)
         else if (contentType.includes("text/html")) {
           const errorText = await response.text();
-          // Пытаемся извлечь сообщение об ошибке из HTML
           const errorMatch =
             errorText.match(/<h1>\d+\s+([^<]+)<\/h1>/) ||
             errorText.match(/<title>\d+\s+([^<]+)<\/title>/);
@@ -49,16 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             throw new Error(`Ошибка сервера: ${response.status}`);
           }
-        }
-        // Любой другой тип ошибки
-        else {
+        } else {
           throw new Error(`Ошибка сервера: ${response.status}`);
         }
       }
 
-      // Если ответ успешный, обрабатываем как blob
+      // Обработка blob
       const blob = await response.blob();
-      const filename = getFilenameFromResponse(response) || "converted";
+      const filename = getFilenameFromResponse(response) || "converted-file";
+
+      lastFileName = filename;
 
       showDownloadButton(blob, filename);
     } catch (err) {
@@ -91,11 +91,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Загрузка файла
   function downloadFile() {
-    if (!lastDownloadUrl) return;
+    if (!lastDownloadUrl || !lastFileName) return;
 
     const a = document.createElement("a");
     a.href = lastDownloadUrl;
-    a.download = "converted_file";
+    a.download = lastFileName;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -108,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const match =
       cd.match(/filename\s*=\s*"([^"]+)"/i) ||
       cd.match(/filename\s*=\s*([^;]+)/i);
+
     return match ? match[1].trim() : null;
   }
 
@@ -129,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function clearResult() {
     resultDiv.innerHTML = "";
     resultDiv.style.display = "none";
+    lastFileName = null;
   }
 
   window.downloadFile = downloadFile;

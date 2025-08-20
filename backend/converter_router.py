@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, Response, HTTPException
-from converters import image_converter  # Убрали font_converter
+from converters import image_converter, image_to_pdf, font_converter
 import os
 import urllib.parse
 
@@ -16,12 +16,22 @@ def convert(
 
     # Словарь допустимых комбинаций
     allowed_conversions = {
+        # Изображения
         "png2jpg": ("png", "jpg"),
-        "jpg2png": ("jpg", "png"),
         "png2webp": ("png", "webp"),
+        "jpg2png": ("jpg", "png"),
         "jpg2webp": ("jpg", "webp"),
         "webp2png": ("webp", "png"),
         "webp2jpg": ("webp", "jpg"),
+
+        # Документы
+        "png2pdf": ("png", "pdf"),
+        "jpg2pdf": ("jpg", "pdf"),
+        "webp2pdf": ("webp", "pdf"),
+
+        # Шрифты
+        "ttf2woff": ("ttf", "woff"),
+        "ttf2woff2": ("ttf", "woff2"),
     }
 
     if conversion_type not in allowed_conversions:
@@ -40,6 +50,10 @@ def convert(
         # Выбор результатов конвертации
         if conversion_type in ["png2jpg", "jpg2png", "png2webp", "jpg2webp", "webp2png", "webp2jpg"]:
             result_bytes, out_ext = image_converter.convert_image(file, conversion_type)
+        elif conversion_type in ["png2pdf", "jpg2pdf", "webp2pdf"]:
+            result_bytes, out_ext = image_to_pdf.convert_to_pdf(file)
+        elif conversion_type in ["ttf2woff", "ttf2woff2"]:
+            result_bytes, out_ext = font_converter.convert_font(file, conversion_type)
         else:
             raise HTTPException(status_code=400, detail="Неподдерживаемый тип конвертации")
 
@@ -63,6 +77,9 @@ def convert(
         "jpg": "image/jpeg",
         "jpeg": "image/jpeg",
         "webp": "image/webp",
+        "pdf": "application/pdf",
+        "woff": "font/woff",
+        "woff2": "font/woff2",
     }
     media_type = media_types.get(out_ext.lower(), "application/octet-stream")
 

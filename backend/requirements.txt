@@ -2,4 +2,5 @@ fastapi
 uvicorn
 pillow
 fonttools
-python-multipart 
+python-multipart
+fonttools
