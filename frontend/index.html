@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -11,34 +11,26 @@
       <h1>Универсальный конвертер</h1>
       <form class="convert-form" enctype="multipart/form-data">
         <label for="file">Выберите файл:</label>
-        <input type="file" id="file" name="file" required /><br />
+        <input type="file" id="file" name="file" />
+        <label for="category">Категория:</label>
+        <select id="category">
+          <option disabled selected value="">Выберите категорию</option>
+          <option value="fonts">Шрифты</option>
+          <option value="docs">Документы</option>
+          <option value="images">Изображения</option>
+        </select>
+
         <label for="conversion-type">Тип конвертации:</label>
-        <select id="conversion-type" name="conversion_type">
-          <option disabled selected value="">Выберите тип конвертации</option>
-          <optgroup label="Шрифты">
-            <option value="ttf2woff">TTF → WOFF</option>
-            <option value="ttf2woff2">TTF → WOFF2</option>
-          </optgroup>
-          <optgroup label="Документы">
-            <option value="png2pdf">PNG → PDF</option>
-            <option value="jpg2pdf">JPG → PDF</option>
-            <option value="webp2pdf">WEBP → PDF</option>
-          </optgroup>
-          <optgroup label="Изображения">
-            <option value="png2jpg">PNG → JPG</option>
-            <option value="jpg2png">JPG → PNG</option>
-            <option value="png2webp">PNG → WEBP</option>
-            <option value="jpg2webp">JPG → WEBP</option>
-            <option value="webp2png">WEBP → PNG</option>
-            <option value="webp2jpg">WEBP → JPG</option>
-          </optgroup></select
-        ><br />
+        <select id="conversion-type" name="conversion_type" disabled>
+          <option disabled selected value="">...</option>
+        </select>
+
         <button type="submit">Конвертировать</button>
       </form>
-      <div class="progress" style="display: none">
-        <div class="progress-text">Готовим...</div>
+      <div class="progress">
+        <div class="progress-text">Подготовка...</div>
         <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+          <div class="progress-fill"></div>
         </div>
       </div>
       <div class="result-block"></div>
