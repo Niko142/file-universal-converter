@@ -48,7 +48,7 @@ export const createResultHandler = (container) => {
       container.innerHTML = `
         <div class="result-container">
           <p class="success-message">Конвертация завершена успешно!</p>
-          <p class="file-info">Файл: ${filename} (${formatFileSize(blob.size)})</p>
+          <p class="file-info">Результат: ${filename} (${formatFileSize(blob.size)})</p>
           <button class="download-btn">Скачать результат</button>
         </div>
       `;

@@ -5,35 +5,34 @@ import {
 } from "../templates/selectOption";
 
 const categorySelect = document.querySelector("#category");
-const conversionSelect = document.querySelector("#conversion-type");
 
-export const initSelectHandler = () => {
+export const initSelectHandler = (conversionSelector) => {
   categorySelect.addEventListener("change", () => {
     const optionItems = CONVERSIONS_OPTIONS[categorySelect.value] || [];
 
     // Стартовая очистка и добавление заглушки
-    conversionSelect.innerHTML = "";
-    conversionSelect.innerHTML = renderStartOption;
+    conversionSelector.innerHTML = "";
+    conversionSelector.innerHTML = renderStartOption;
 
     // Формирование опций на основе выбранной категории
     optionItems.forEach((item) => {
-      conversionSelect.insertAdjacentHTML(
+      conversionSelector.insertAdjacentHTML(
         "beforeend",
         renderSelectOption({ value: item.value, label: item.label })
       );
     });
 
-    conversionSelect.disabled = false;
+    conversionSelector.disabled = false;
   });
 };
 
-export function validateSelections(handler) {
+export function validateSelections({ handler, conversionSelector }) {
   if (!categorySelect.value) {
     handler.showError("Ошибка: необходимо выбрать категорию");
     return false;
   }
 
-  if (!conversionSelect.value) {
+  if (!conversionSelector.value) {
     handler.showError("Не выбран формат преобразования");
     return false;
   }

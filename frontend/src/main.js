@@ -10,11 +10,12 @@ import "./style.css";
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector(".convert-form");
   const resultContainer = document.querySelector(".result-block");
+  const conversionSelect = document.querySelector("#conversion-type");
 
   // Обработчик показа результатов
   const resultHandler = createResultHandler(resultContainer);
   // Инициализация логики работы select-компонентов
-  initSelectHandler();
+  initSelectHandler(conversionSelect);
   // Инициализация логики и функционала индикатора загрузки
   const progressBar = initProgressBar();
 
@@ -22,17 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     resultHandler.clear();
 
-    const formData = new FormData(form);
-    const fileInput = form.querySelector('input[type="file"]');
-    const file = fileInput.files[0];
+    const formData = new FormData();
 
-    if (!file) {
-      resultHandler.showError("Необходимо выбрать файл для конвертации");
-      return;
+    const fileInput = document.querySelector('input[type="file"]');
+    const files = fileInput.files;
+    for (let file of files) {
+      formData.append("files", file);
     }
 
+    formData.append("conversion_type", conversionSelect.value);
+
     // Валидация select-полей (на основе true/false)
-    if (!validateSelections(resultHandler)) {
+    if (
+      !validateSelections({
+        handler: resultHandler,
+        conversionSelector: conversionSelect,
+      })
+    ) {
       return;
     }
 
@@ -70,7 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const blob = new Blob(chunks);
-      const filename = getFilenameFromResponse(response) || "converted-file";
+      const filename =
+        getFilenameFromResponse(response) || "Converted-files.zip";
 
       resultHandler.showSuccess(blob, filename);
     } catch (err) {
