@@ -87,6 +87,10 @@ button {
   }
 }
 
+input[type="file"] {
+  border: 2px dashed var(--color-border);
+}
+
 button {
   font-weight: 600;
   background-color: var(--color-primary);

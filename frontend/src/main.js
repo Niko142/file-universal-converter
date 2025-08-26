@@ -9,13 +9,18 @@ import "./style.css";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector(".convert-form");
+  const fileInput = document.querySelector('input[type="file"]');
   const resultContainer = document.querySelector(".result-block");
   const conversionSelect = document.querySelector("#conversion-type");
 
   // Обработчик показа результатов
   const resultHandler = createResultHandler(resultContainer);
   // Инициализация логики работы select-компонентов
-  initSelectHandler(conversionSelect);
+  initSelectHandler({
+    conversionSelector: conversionSelect,
+    fileSelector: fileInput,
+    handler: resultHandler,
+  });
   // Инициализация логики и функционала индикатора загрузки
   const progressBar = initProgressBar();
 
@@ -24,15 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
     resultHandler.clear();
 
     const formData = new FormData();
-    const fileInput = document.querySelector('input[type="file"]');
     const files = fileInput.files;
     for (let file of files) {
       formData.append("files", file);
     }
     formData.append("conversion_type", conversionSelect.value);
 
+    // Обработчик валидации
     if (
       !validateSelections({
+        filesData: files,
         handler: resultHandler,
         conversionSelector: conversionSelect,
       })

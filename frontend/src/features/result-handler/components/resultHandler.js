@@ -103,11 +103,9 @@ export const createResultHandler = (container) => {
     showResult: async (result) => {
       cleanupUrls(downloadUrls, lastDownloadURL);
 
-      if (result.type === "single") {
-        await showCurrentFile(result.blob, result.filename);
-      } else {
-        await showMultipleFiles(result.files);
-      }
+      await (result.type === "single"
+        ? showCurrentFile(result.blob, result.filename)
+        : showMultipleFiles(result.files));
     },
     // Показываем ошибку
     showError: (message) => {
