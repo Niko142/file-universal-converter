@@ -3,8 +3,8 @@ import {
   validateSelections,
 } from "./features/select-handler";
 import { initProgressBar } from "./features/progress-bar";
-import { getFilenameFromResponse } from "./utils/headers";
-import { createResultHandler } from "./utils/resultHandler";
+import { convertFiles } from "./services/conversionService";
+import { createResultHandler } from "./features/result-handler";
 import "./style.css";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,16 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
     resultHandler.clear();
 
     const formData = new FormData();
-
     const fileInput = document.querySelector('input[type="file"]');
     const files = fileInput.files;
     for (let file of files) {
       formData.append("files", file);
     }
-
     formData.append("conversion_type", conversionSelect.value);
 
-    // Валидация select-полей (на основе true/false)
     if (
       !validateSelections({
         handler: resultHandler,
@@ -44,43 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // Задаем разметку индикатора
       progressBar.showProgress();
 
-      const response = await fetch("http://localhost:8000/convert", {
-        method: "POST",
-        body: formData,
-      });
+      // Результаты конвертации файла/ов
+      const result = await convertFiles(formData, progressBar);
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(`${data.detail || response.status}`);
-      }
-
-      // Чтение потока данных
-      const reader = response.body.getReader();
-      const contentLength = +response.headers.get("Content-Length") || 0;
-
-      let receivedLength = 0;
-      const chunks = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        receivedLength += value.length;
-
-        if (contentLength) {
-          let percent = (receivedLength / contentLength) * 100;
-          progressBar.fillProgress(percent.toFixed(1));
-        }
-      }
-
-      const blob = new Blob(chunks);
-      const filename =
-        getFilenameFromResponse(response) || "Converted-files.zip";
-
-      resultHandler.showSuccess(blob, filename);
+      // Показ результата
+      resultHandler.showResult(result);
     } catch (err) {
       resultHandler.showError("Ошибка: " + err.message);
     } finally {
