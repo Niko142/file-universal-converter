@@ -8,6 +8,7 @@ import uuid
 from typing import Dict
 import tempfile
 import json
+import re
 
 router = APIRouter()
 
@@ -46,6 +47,12 @@ async def convert(
     for file in files:
         base_name, ext = os.path.splitext(file.filename or "")
         ext = ext.lstrip(".").lower()
+
+        if not re.match(r'^[A-Za-z0-9_\-\.]+$', file.filename):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Недопустимое имя файла '{file.filename}'"
+            )
 
         # Валидация расширения для каждого файла
         if ext and ext != expected_input:
