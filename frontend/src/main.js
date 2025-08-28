@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       resultHandler.showError("Ошибка: " + err.message);
     } finally {
-      progressBar.hideProgress(400);
+      progressBar.hideProgress();
     }
   };
 

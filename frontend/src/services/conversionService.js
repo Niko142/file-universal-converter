@@ -66,6 +66,11 @@ async function readBinaryResponse(response, progressBar) {
   let receivedLength = 0;
   const chunks = [];
 
+  // Показываем начальный прогресс
+  if (progressBar) {
+    progressBar.fillProgress(0);
+  }
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -75,8 +80,19 @@ async function readBinaryResponse(response, progressBar) {
 
     if (contentLength && progressBar) {
       const percent = (receivedLength / contentLength) * 100;
-      progressBar.fillProgress(percent.toFixed(1));
+      progressBar.fillProgress(percent);
+    } else if (progressBar) {
+      // Если Content-Length недоступен, то делаем имитацию
+      const estimatedPercent = Math.min(
+        (receivedLength / (1024 * 1024)) * 15,
+        85
+      );
+      progressBar.fillProgress(estimatedPercent);
     }
+  }
+
+  if (progressBar) {
+    progressBar.fillProgress(100);
   }
 
   return new Blob(chunks);

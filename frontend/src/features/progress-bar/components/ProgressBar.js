@@ -1,25 +1,44 @@
 export function initProgressBar() {
   const progressBar = document.querySelector(".progress");
   const progressFill = document.querySelector(".progress-fill");
+  const progressText = document.querySelector(".progress-text");
 
   if (!progressBar || !progressFill) {
     console.error("Элементы индикатора загрузки не найдены");
     return;
   }
 
-  function showProgress() {
+  // Показываем индикатор
+  function showProgress(text = "Подготовка...") {
+    progressText.textContent = text;
     progressBar.classList.add("active");
-    fillProgress(0);
   }
 
-  function hideProgress(delay) {
+  // Скрываем индикатор
+  function hideProgress() {
     setTimeout(() => {
       progressBar.classList.remove("active");
-    }, delay);
+      progressFill.style.width = "0%";
+    }, 500);
   }
 
+  // Эффект заполняемости шкалы
   function fillProgress(percent) {
-    progressFill.style.width = `${percent}%`;
+    const clampedPercent = Math.min(Math.max(percent, 0), 100);
+
+    requestAnimationFrame(() => {
+      progressFill.style.width = `${clampedPercent}%`;
+    });
+
+    if (clampedPercent < 30) {
+      progressText.textContent = "Подготовка...";
+    } else {
+      progressText.textContent = "Готово!";
+    }
+
+    if (clampedPercent >= 100) {
+      setTimeout(() => hideProgress(), 1000);
+    }
   }
 
   return {

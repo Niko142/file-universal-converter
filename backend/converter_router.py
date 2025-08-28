@@ -101,7 +101,8 @@ async def convert(
             content=content,
             media_type=media_type,
             headers={
-                "Content-Disposition": f'attachment; filename="{final_filename}"; filename*=UTF-8\'\'{quoted_filename}'
+                "Content-Disposition": f'attachment; filename="{final_filename}"; filename*=UTF-8\'\'{quoted_filename}',
+                "Content-Length": str(len(content)),
             },
         )
 
@@ -148,7 +149,8 @@ async def download_file(file_id: str):
         content=content,
         media_type=media_type,
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"; filename*=UTF-8\'\'{quoted_filename}'
+            "Content-Disposition": f'attachment; filename="{filename}"; filename*=UTF-8\'\'{quoted_filename}',
+            "Content-Length": str(len(content))
         },
     )
 
@@ -175,5 +177,5 @@ async def download_zip(file_ids: list[str] = Form(...)):
     return Response(
         content=zip_buffer.getvalue(),
         media_type="application/zip",
-        headers={"Content-Disposition": 'attachment; filename="converted_files.zip"'},
+        headers={"Content-Disposition": 'attachment; filename="converted_files.zip"', "Content-Length": str(len(zip_bytes))},
     )
