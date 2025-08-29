@@ -18,4 +18,9 @@ app.include_router(router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Backend успешно запущен"} 
+    return {"message": "Backend успешно запущен"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+    
