@@ -1,8 +1,9 @@
+import { API_BASE_URL } from "@/api/config";
 import { getFilenameFromResponse } from "@/utils/headers";
 
 // Обработчик для конвертации файлов
 export async function convertFiles(formData, progressBar = null) {
-  const response = await fetch("http://localhost:8000/convert", {
+  const response = await fetch(`${API_BASE_URL}/convert`, {
     method: "POST",
     body: formData,
   });
@@ -36,7 +37,7 @@ export async function convertFiles(formData, progressBar = null) {
 
 // Загрузка выбранного файла
 export async function downloadFile(fileId) {
-  const response = await fetch(`http://localhost:8000/download-file/${fileId}`);
+  const response = await fetch(`${API_BASE_URL}/download-file/${fileId}`);
   if (!response.ok) {
     throw new Error(`Ошибка загрузки файла ${fileId}`);
   }
@@ -48,7 +49,7 @@ export async function downloadZip(fileIds) {
   const formData = new FormData();
   fileIds.forEach((id) => formData.append("file_ids", id));
 
-  const response = await fetch("http://localhost:8000/download-zip", {
+  const response = await fetch(`${API_BASE_URL}/download-zip`, {
     method: "POST",
     body: formData,
   });
