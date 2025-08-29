@@ -1,0 +1,28 @@
+# Frontend
+node_modules/
+npm-debug.log*
+
+# Backend
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+
+# Общие
+.git/
+.gitignore
+.gitattributes
+README.md
+Dockerfile
+.dockerignore
+
+# Логи
+*.log
+*.tmp
+*.temp
+
+# IDE
+.vscode/

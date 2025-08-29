@@ -174,8 +174,10 @@ async def download_zip(file_ids: list[str] = Form(...)):
             zf.writestr(filename, content)
     zip_buffer.seek(0)
 
+    zip_bytes = zip_buffer.getvalue()
+
     return Response(
-        content=zip_buffer.getvalue(),
+        content=zip_bytes,
         media_type="application/zip",
         headers={"Content-Disposition": 'attachment; filename="converted_files.zip"', "Content-Length": str(len(zip_bytes))},
     )
