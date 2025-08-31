@@ -39,8 +39,8 @@
 
 3. Открываем интерфейс в браузере:
 
-Frontend: [http://localhost:5173]
-Backend API: [http://localhost:8000]
+[Frontend:](http://localhost:5173)
+[Backend API:](http://localhost:8000)
 
 ### Ручная установка
 
@@ -128,6 +128,7 @@ Backend API: [http://localhost:8000]
 ## Структура проекта
 
 <!-- prettier-ignore -->
+```text
 FontImageConverter
 ├── README.md
 ├── backend
@@ -170,6 +171,7 @@ FontImageConverter
     │       ├── formatFile.js
     │       └── headers.js
     └── vite.config.js
+```
 
 ## Планы на развитие проекта
 
