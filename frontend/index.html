@@ -6,36 +6,56 @@
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta name="description" content="" /> -->
   </head>
   <body>
-    <div class="container">
-      <h1>Универсальный конвертер</h1>
-      <form class="convert-form" enctype="multipart/form-data">
-        <label for="file">Выберите файл:</label>
-        <input type="file" id="file" name="file" multiple />
-        <label for="category">Категория:</label>
-        <select id="category" disabled>
-          <option disabled selected value="">Выберите категорию</option>
-          <option value="fonts">Шрифты</option>
-          <option value="docs">Документы</option>
-          <option value="images">Изображения</option>
-        </select>
+    <main class="app">
+      <header class="app-header">
+        <h1 class="app-header__title">Универсальный конвертер</h1>
+        <p class="app-header__description">
+          Быстрая и безопасная конвертация файлов
+        </p>
+      </header>
 
-        <label for="conversion-type">Тип конвертации:</label>
-        <select id="conversion-type" name="conversion_type" disabled>
-          <option disabled selected value="">...</option>
-        </select>
+      <!-- Основная форма -->
+      <form class="converter-form" enctype="multipart/form-data">
+        <label for="file"
+          >Выберите файл:
+          <input type="file" id="file" name="file" multiple />
+        </label>
 
-        <button type="submit">Конвертировать</button>
+        <label for="category"
+          >Категория:
+          <select id="category" disabled>
+            <option disabled selected value="">Не выбрано</option>
+            <option value="fonts">Шрифты</option>
+            <option value="docs">Документы</option>
+            <option value="images">Изображения</option>
+          </select>
+        </label>
+
+        <label for="conversion-type"
+          >Тип конвертации:
+          <select id="conversion-type" name="conversion-type" disabled>
+            <option disabled selected value="">Не выбрано</option>
+          </select>
+        </label>
+
+        <button type="submit" class="btn btn--convert">Конвертировать</button>
       </form>
-      <div class="progress">
-        <div class="progress-text">Подготовка...</div>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-        </div>
-      </div>
-      <div class="result-block"></div>
-    </div>
+
+      <!-- Блок, показывающий результаты в результате конвертации -->
+      <div class="results"></div>
+
+      <footer class="app-footer">
+        <hr />
+        <p class="app-footer__content">
+          Поддерживаемые форматы:
+          <i>TTF, WOFF, WOFF2, PNG, JPG, WEBP, JPG</i>
+        </p>
+      </footer>
+    </main>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

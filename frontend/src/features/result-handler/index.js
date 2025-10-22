@@ -1,1 +1,1 @@
-export { createResultHandler } from "./components/resultHandler";
+export { initResultHandler } from "./components/resultHandler";

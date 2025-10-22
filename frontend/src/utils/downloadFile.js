@@ -1,8 +1,10 @@
+import { revokeObjectURL } from "./url";
+
 // Очистка от предыдущих Blob-URL
 export function cleanupUrls(urls = [], lastUrl = null) {
   urls.forEach((urlData) => {
     try {
-      window.URL.revokeObjectURL(urlData.url);
+      revokeObjectURL(urlData.url);
     } catch (err) {
       console.error("Ошибка освобождения URL:", err);
     }
@@ -10,7 +12,7 @@ export function cleanupUrls(urls = [], lastUrl = null) {
 
   if (lastUrl) {
     try {
-      window.URL.revokeObjectURL(lastUrl);
+      revokeObjectURL(lastUrl);
     } catch (err) {
       console.error("Ошибка освобождения URL:", err);
     }

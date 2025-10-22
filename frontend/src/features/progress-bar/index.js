@@ -1,1 +1,1 @@
-export { initProgressBar } from "./components/ProgressBar";
+export { initProgressBar } from "./components/progressBar";

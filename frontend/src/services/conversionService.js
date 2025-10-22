@@ -1,8 +1,9 @@
 import { API_BASE_URL } from "@/api/config";
+import { fileSize } from "@/constants/file";
 import { getFilenameFromResponse } from "@/utils/headers";
 
 // Обработчик для конвертации файлов
-export async function convertFiles(formData, progressBar = null) {
+export const convertFiles = async (formData, progressBar = null) => {
   const response = await fetch(`${API_BASE_URL}/convert`, {
     method: "POST",
     body: formData,
@@ -14,15 +15,22 @@ export async function convertFiles(formData, progressBar = null) {
   }
 
   const contentType = response.headers.get("content-type");
+
   // Если сервер вернул JSON, значит несколько файлов
   if (contentType?.includes("application/json")) {
     const data = await response.json();
+
+    if (progressBar) {
+      progressBar.fillProgress(100);
+    }
+
     return {
       type: "multiple",
       files: data.files,
     };
   } else {
     // Иначе бинарный файл с одним файлом
+
     // Стандартная обработка файла
     const blob = await readBinaryResponse(response, progressBar);
     const filename = getFilenameFromResponse(response) || "Converted-file";
@@ -33,19 +41,19 @@ export async function convertFiles(formData, progressBar = null) {
       filename,
     };
   }
-}
+};
 
 // Загрузка выбранного файла
-export async function downloadFile(fileId) {
+export const downloadFile = async (fileId) => {
   const response = await fetch(`${API_BASE_URL}/download-file/${fileId}`);
   if (!response.ok) {
     throw new Error(`Ошибка загрузки файла ${fileId}`);
   }
   return response.blob();
-}
+};
 
 // Загрузка нескольких файлов в виде ZIP-архива
-export async function downloadZip(fileIds) {
+export const downloadZip = async (fileIds) => {
   const formData = new FormData();
   fileIds.forEach((id) => formData.append("file_ids", id));
 
@@ -58,10 +66,10 @@ export async function downloadZip(fileIds) {
     throw new Error("Ошибка при создании ZIP");
   }
   return response.blob();
-}
+};
 
 // Обработчик для чтения бинарного ответа
-async function readBinaryResponse(response, progressBar) {
+const readBinaryResponse = async (response, progressBar) => {
   const reader = response.body.getReader();
   const contentLength = +response.headers.get("Content-Length") || 0;
   let receivedLength = 0;
@@ -85,7 +93,7 @@ async function readBinaryResponse(response, progressBar) {
     } else if (progressBar) {
       // Если Content-Length недоступен, то делаем имитацию
       const estimatedPercent = Math.min(
-        (receivedLength / (1024 * 1024)) * 15,
+        (receivedLength / (fileSize * fileSize)) * 15,
         85
       );
       progressBar.fillProgress(estimatedPercent);
@@ -97,4 +105,4 @@ async function readBinaryResponse(response, progressBar) {
   }
 
   return new Blob(chunks);
-}
+};

@@ -1,49 +1,63 @@
-export function initProgressBar() {
-  const progressBar = document.querySelector(".progress");
-  const progressFill = document.querySelector(".progress-fill");
-  const progressText = document.querySelector(".progress-text");
+import { HIDE_DELAY } from "@/constants/delay";
+import { clampPercent } from "@/utils/math";
+import { renderProgressBar } from "../templates/progressBar";
+import { PROGRESS_TEXTS } from "../constants/text";
 
-  if (!progressBar || !progressFill) {
-    console.error("Элементы индикатора загрузки не найдены");
+export const initProgressBar = () => {
+  const form = document.querySelector(".converter-form");
+
+  if (!form) {
+    console.warn("Converter-form не найдена");
     return;
   }
 
-  // Показываем индикатор
-  function showProgress(text = "Подготовка...") {
-    progressText.textContent = text;
-    progressBar.classList.add("active");
-  }
+  form.insertAdjacentHTML("beforeend", renderProgressBar());
 
-  // Скрываем индикатор
-  function hideProgress() {
-    setTimeout(() => {
-      progressBar.classList.remove("active");
-      progressFill.style.width = "0%";
-    }, 500);
-  }
+  const progressBar = form.querySelector(".progress");
+  const progressText = progressBar.querySelector(".progress__text");
+  const progressFill = progressBar.querySelector(".progress__fill");
 
-  // Эффект заполняемости шкалы
-  function fillProgress(percent) {
-    const clampedPercent = Math.min(Math.max(percent, 0), 100);
+  let hideTimeout = null;
+  // Метод для скрытия индикатора
+  const hideProgress = () => {
+    return new Promise((resolve) => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+      }
+
+      hideTimeout = setTimeout(() => {
+        progressBar.classList.remove("active");
+        progressFill.style.width = "0%";
+        hideTimeout = null;
+        resolve();
+      }, HIDE_DELAY);
+    });
+  };
+
+  // Метод заполнения индикатора
+  const fillProgress = (percent) => {
+    const clampedPercent = clampPercent(percent);
 
     requestAnimationFrame(() => {
       progressFill.style.width = `${clampedPercent}%`;
     });
 
-    if (clampedPercent < 30) {
-      progressText.textContent = "Подготовка...";
+    if (clampedPercent < 90) {
+      progressText.textContent = PROGRESS_TEXTS.preparing;
     } else {
-      progressText.textContent = "Готово!";
+      progressText.textContent = PROGRESS_TEXTS.complete;
     }
+  };
 
-    if (clampedPercent >= 100) {
-      setTimeout(() => hideProgress(), 1000);
-    }
-  }
+  // Метод показа индикатора
+  const showProgress = (text = PROGRESS_TEXTS.preparing) => {
+    progressText.textContent = text;
+    progressBar.classList.add("active");
+  };
 
   return {
     showProgress,
     hideProgress,
     fillProgress,
   };
-}
+};

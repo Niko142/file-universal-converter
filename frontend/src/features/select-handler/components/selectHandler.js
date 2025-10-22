@@ -1,88 +1,117 @@
-import { CONVERSIONS_OPTIONS } from "@/constants/conversions";
+import { CONVERSIONS_OPTIONS } from "@/constants/conversionTypes";
 import {
   renderSelectOption,
   renderStartOption,
-} from "../templates/selectOption";
+} from "../templates/selectOptions";
+import { getFileExtensions, getUniqueExtensions } from "../utils/fileUtils";
 
-const categorySelect = document.querySelector("#category");
+/**
+ * Обновление состояния input-селекторов
+ * @param {HTMLSelectElement} categorySelect - Селектор категории
+ * @param {HTMLSelectElement} conversionSelect - Селектор выбора типа конвертации
+ * @param {boolean} disabled - Флаг для блокирования/разблокирования селекторов
+ */
+const updateSelects = (categorySelect, conversionSelect, disabled = true) => {
+  categorySelect.disabled = disabled;
+  conversionSelect.disabled = disabled;
 
+  if (disabled) {
+    categorySelect.value = "";
+    conversionSelect.value = "";
+  }
+};
+
+/**
+ * Формирование подходящих option на основе ext
+ * @param {HTMLSelectElement} conversionSelector - Селектор выбора типа конвертации
+ * @param {Array} items - Массив доступных типов конвертации
+ * @param {string} fileExt - Расширение файла
+ */
+const makeSuitableOptions = (conversionSelector, items, fileExt) => {
+  // Стартовая очистка и добавление заглушки
+  conversionSelector.innerHTML = renderStartOption;
+
+  // Фильтруем подходящие option на основе полученного ext
+  const filteredOptions = items.filter((item) =>
+    item.value.startsWith(fileExt)
+  );
+
+  // Формируем подходящие option
+  filteredOptions.forEach((item) => {
+    conversionSelector.insertAdjacentHTML(
+      "beforeend",
+      renderSelectOption(item)
+    );
+  });
+
+  conversionSelector.disabled = filteredOptions.length === 0;
+};
+
+// Инициализация select-handler-логики
 export const initSelectHandler = ({
   conversionSelector,
+  categorySelector,
   fileSelector,
   handler,
 }) => {
-  // Функция для получения расширения всех файлов
-  function getFileExtensions(fileList) {
-    return [...fileList].map((file) =>
-      file.name.split(".").pop().toLowerCase()
-    );
-  }
-
-  // Обработчик, управляющий disabled в зависимости от изменения input-file
-  fileSelector.addEventListener("change", () => {
+  // Обработчик в случа изменения файла для конвертирования
+  const handleFileChange = () => {
     conversionSelector.value = "";
 
     if (fileSelector.files.length === 0) {
-      categorySelect.value = "";
-      categorySelect.disabled = conversionSelector.disabled = true;
+      updateSelects(categorySelector, conversionSelector);
       return;
     }
 
-    // Берем расширения всех файлов (если их несколько)
-    const filesExt = getFileExtensions(fileSelector.files);
-
-    // Фильтруем для получения только уникальных ext
-    const uniqueExts = [...new Set(filesExt)];
+    // Формируем список уникальных ext
+    const uniqueExts = getUniqueExtensions(fileSelector.files);
 
     if (uniqueExts.length > 1) {
-      categorySelect.value = "";
-      categorySelect.disabled = conversionSelector.disabled = true;
+      updateSelects(categorySelector, conversionSelector);
 
       handler.showError("Ошибка: файлы должны быть одинакового типа");
       return;
     }
 
-    categorySelect.disabled = false;
-  });
+    categorySelector.disabled = false;
+  };
 
-  categorySelect.addEventListener("change", () => {
-    const optionItems = CONVERSIONS_OPTIONS[categorySelect.value] || [];
+  // Обработчик в случае изменения категории
+  const handleCategoryChange = () => {
+    const optionItems = CONVERSIONS_OPTIONS[categorySelector.value] || [];
 
-    // Стартовая очистка и добавление заглушки
-    conversionSelector.innerHTML = renderStartOption;
-
-    // Берем единственно нужное нам расширение
     const fileExt = getFileExtensions(fileSelector.files)[0];
 
-    // Фильтруем подходящие option на основе полученного ext
-    const filteredOptions = optionItems.filter((item) =>
-      item.value.startsWith(fileExt)
-    );
+    makeSuitableOptions(conversionSelector, optionItems, fileExt);
+  };
 
-    // Формируем нужные option
-    filteredOptions.forEach((item) => {
-      conversionSelector.insertAdjacentHTML(
-        "beforeend",
-        renderSelectOption({ value: item.value, label: item.label })
-      );
-    });
+  fileSelector.addEventListener("change", handleFileChange);
+  categorySelector.addEventListener("change", handleCategoryChange);
 
-    conversionSelector.disabled = filteredOptions.length === 0;
-  });
+  // clean-up для оптимизации
+  return () => {
+    fileSelector.removeEventListener("change", handleFileChange);
+    categorySelector.removeEventListener("change", handleCategoryChange);
+  };
 };
 
-// Валидация формы
-export function validateSelections({ filesData, handler, conversionSelector }) {
-  if (filesData.length === 0) {
-    handler.showError("Ошибка: Необходимо выбрать файл");
+// Валидация данных перед отправкой формы
+export function validateSelections({
+  files,
+  handler,
+  categorySelector,
+  conversionSelector,
+}) {
+  if (files.length === 0) {
+    handler.showError("Ошибка: файл/ы не выбран/ы!");
     return false;
   }
-  if (!categorySelect.value) {
-    handler.showError("Ошибка: необходимо выбрать категорию");
+  if (!categorySelector.value) {
+    handler.showError("Ошибка: категория не выбрана!");
     return false;
   }
   if (!conversionSelector.value) {
-    handler.showError("Не выбран формат преобразования");
+    handler.showError("Ошибка: формат конвертации не выбран!");
     return false;
   }
   return true;

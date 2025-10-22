@@ -1,31 +1,33 @@
+import { initProgressBar } from "./features/progress-bar";
+import { createResultHandler } from "./features/result-handler";
 import {
   initSelectHandler,
   validateSelections,
 } from "./features/select-handler";
-import { initProgressBar } from "./features/progress-bar";
 import { convertFiles } from "./services/conversionService";
-import { createResultHandler } from "./features/result-handler";
+
 import "./style.css";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector(".convert-form");
+  const form = document.querySelector(".converter-form");
   const fileInput = document.querySelector('input[type="file"]');
-  const resultContainer = document.querySelector(".result-block");
   const conversionSelect = document.querySelector("#conversion-type");
+  const categorySelect = document.querySelector("#category");
 
   // Обработчик показа результатов
-  const resultHandler = createResultHandler(resultContainer);
+  const resultHandler = createResultHandler();
   // Инициализация логики работы select-компонентов
   initSelectHandler({
     conversionSelector: conversionSelect,
+    categorySelector: categorySelect,
     fileSelector: fileInput,
     handler: resultHandler,
   });
   // Инициализация логики и функционала индикатора загрузки
   const progressBar = initProgressBar();
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
     resultHandler.clear();
 
     const formData = new FormData();
@@ -38,8 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Обработчик валидации
     if (
       !validateSelections({
-        filesData: files,
+        files: files,
         handler: resultHandler,
+        categorySelector: categorySelect,
         conversionSelector: conversionSelect,
       })
     ) {
@@ -49,15 +52,15 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       progressBar.showProgress();
 
-      // Результаты конвертации файла/ов
+      // Конвертируем файлы
       const result = await convertFiles(formData, progressBar);
 
-      // Показ результата
+      // Если все прошло успешно, то скрываем progress-bar и выводим результаты
+      await progressBar.hideProgress();
       resultHandler.showResult(result);
     } catch (err) {
-      resultHandler.showError("Ошибка: " + err.message);
-    } finally {
-      progressBar.hideProgress();
+      await progressBar.hideProgress();
+      resultHandler.showError(`Ошибка: ${err.message}`);
     }
   };
 
