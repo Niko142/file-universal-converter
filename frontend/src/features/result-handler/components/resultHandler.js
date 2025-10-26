@@ -7,6 +7,14 @@ import {
 } from "../templates";
 import { cleanupUrls, triggerDownload } from "@/utils/downloadFile";
 import { createObjectUrl, revokeObjectURL } from "@/utils/url";
+import {
+  CircleCheck,
+  CircleX,
+  createIcons,
+  Download,
+  FolderDown,
+  RefreshCcw,
+} from "lucide";
 
 export const initResultHandler = () => {
   const resultContainer = document.querySelector(".results");
@@ -124,11 +132,29 @@ export const initResultHandler = () => {
     type === "single"
       ? showSingleFile(blob, filename)
       : await showMultipleFiles(files);
+
+    createIcons({
+      icons: {
+        Download,
+        RefreshCcw,
+        FolderDown,
+        CircleCheck,
+        CircleX,
+      },
+      attrs: { width: 22, height: 22 },
+    });
   };
 
   // Метод для отображения ошибки
   const showError = (msg) => {
     displayResultContainer(renderErrorMessage(msg));
+    createIcons({
+      icons: {
+        RefreshCcw,
+        CircleX,
+      },
+      attrs: { width: 22, height: 22 },
+    });
   };
 
   // Метод для очистки данных

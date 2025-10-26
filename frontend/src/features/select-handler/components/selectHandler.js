@@ -103,15 +103,15 @@ export function validateSelections({
   conversionSelector,
 }) {
   if (files.length === 0) {
-    handler.showError("Ошибка: файл/ы не выбран/ы!");
+    handler.showError("Выберите файл");
     return false;
   }
   if (!categorySelector.value) {
-    handler.showError("Ошибка: категория не выбрана!");
+    handler.showError("Выберите категорию");
     return false;
   }
   if (!conversionSelector.value) {
-    handler.showError("Ошибка: формат конвертации не выбран!");
+    handler.showError("Выберите формат конвертации");
     return false;
   }
   return true;

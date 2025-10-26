@@ -1,5 +1,6 @@
+import { createIcons, RefreshCcw } from "lucide";
 import { initProgressBar } from "./features/progress-bar";
-import { createResultHandler } from "./features/result-handler";
+import { initResultHandler } from "./features/result-handler";
 import {
   initSelectHandler,
   validateSelections,
@@ -9,13 +10,19 @@ import { convertFiles } from "./services/conversionService";
 import "./style.css";
 
 document.addEventListener("DOMContentLoaded", () => {
+  createIcons({
+    icons: {
+      RefreshCcw,
+    },
+    attrs: { width: 24, height: 24 },
+  });
   const form = document.querySelector(".converter-form");
   const fileInput = document.querySelector('input[type="file"]');
   const conversionSelect = document.querySelector("#conversion-type");
   const categorySelect = document.querySelector("#category");
 
   // Обработчик показа результатов
-  const resultHandler = createResultHandler();
+  const resultHandler = initResultHandler();
   // Инициализация логики работы select-компонентов
   initSelectHandler({
     conversionSelector: conversionSelect,

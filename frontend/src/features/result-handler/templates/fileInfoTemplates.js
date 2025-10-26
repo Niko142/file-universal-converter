@@ -9,6 +9,7 @@ export const renderFileInfo = ({ filename, size, index }) => {
         </div>
         <button class="btn btn--download-single" data-index="${index}">
           Скачать
+          <i data-lucide="download"></i>
         </button>
       </div>
     `;

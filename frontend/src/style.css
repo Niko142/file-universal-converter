@@ -61,6 +61,10 @@ label {
   margin-bottom: 4px;
 }
 
+svg {
+  display: block;
+}
+
 .converter-form {
   display: flex;
   flex-direction: column;
@@ -130,6 +134,10 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
   font-weight: 600;
   background-color: var(--color-primary);
   color: var(--color-primary-text);
@@ -147,10 +155,6 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .btn--convert {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
   padding-block: 15px !important;
 }
 
@@ -172,6 +176,7 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .btn--download {
+  gap: 5px;
   border: 2px solid var(--color-green-hover);
 }
 
@@ -183,7 +188,7 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .btn--download-single {
-  margin: 0;
+  gap: 5px;
   width: fit-content;
   padding: 10px 30px;
   border: 2px solid var(--color-green-hover);
@@ -270,6 +275,9 @@ input[type="file"]::file-selector-button:hover {
 
 .success-message,
 .error-message {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   width: fit-content;
   font-weight: 600;
   padding: 5px 10px;
@@ -282,6 +290,10 @@ input[type="file"]::file-selector-button:hover {
   color: var(--color-green);
   background-color: rgba(16, 185, 129, 0.1);
 
+  &.success-message--multiple {
+    flex-direction: column;
+  }
+
   p {
     font-weight: 600;
     line-height: 1.2;
@@ -289,6 +301,7 @@ input[type="file"]::file-selector-button:hover {
     color: var(--color-green-hover);
   }
   span {
+    align-self: baseline;
     font-size: 0.85rem;
     font-weight: 400;
     color: var(--color-title);
@@ -399,6 +412,11 @@ input[type="file"]::file-selector-button:hover {
 }
 
 @media (max-width: 475px) {
+  .app {
+    max-width: 95%;
+    padding-inline: 10px;
+  }
+
   .success-message {
     padding: 3px 5px;
   }
