@@ -1,5 +1,5 @@
 import { HIDE_DELAY } from "@/constants/delay";
-import { clampPercent } from "@/utils/math";
+import { clampPercent } from "@/utils/calculate";
 import { renderProgressBar } from "../templates/progressBar";
 import { PROGRESS_TEXTS } from "../constants/text";
 

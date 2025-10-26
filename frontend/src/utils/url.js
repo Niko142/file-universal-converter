@@ -1,6 +1,6 @@
 /**
  * Создает временный Blob-URL для доступа к Blob
- * @param {*} blob
+ * @param {Blob} blob
  * @returns Временный URL
  */
 export const createObjectUrl = (blob) => window.URL.createObjectURL(blob);

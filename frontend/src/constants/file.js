@@ -1,1 +1,1 @@
-export const fileSize = 1024;
+export const UNIT_SIZE = 1024;
