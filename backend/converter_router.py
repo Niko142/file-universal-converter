@@ -6,20 +6,32 @@ import os
 import urllib.parse
 import uuid
 from typing import Dict
-import tempfile
-import json
 import re
+from transliterate import translit
 
 router = APIRouter()
 
 # Аналог хранилища данных 
 file_storage: Dict[str, tuple[str, bytes]] = {}
 
+def safe_transliterate(filename: str) -> str:
+    """Транспиляция имени файла с кириллицы в латиницу"""
+    name, ext = os.path.splitext(filename)
+    try:
+        name = translit(name, 'ru', reversed=True)
+    except Exception:
+        name = filename
+    # Убираем лишние символы, заменяя их на "_"
+    name = re.sub(r'[^A-Za-z0-9_\-\.]+', '_', name)
+    return f"{name}{ext}"
+
 @router.post("/convert")
+
 async def convert(
     files: list[UploadFile] = File(...),
     conversion_type: str = Form(...),
 ):
+    """Обработчик"""
     allowed_conversions = {
         # Изображения
         "png2jpg": ("png", "jpg"),
@@ -41,14 +53,13 @@ async def convert(
         raise HTTPException(status_code=400, detail="Недопустимое преобразование форматов")
 
     expected_input, expected_output = allowed_conversions[conversion_type]
-
     results: list[tuple[str, bytes]] = []
 
     for file in files:
         base_name, ext = os.path.splitext(file.filename or "")
         ext = ext.lstrip(".").lower()
 
-        if not re.match(r'^[A-Za-z0-9_\-\.]+$', file.filename):
+        if not re.match(r'^[A-Za-z\u0400-\u04FF0-9_\-\.\s]+$', file.filename):
             raise HTTPException(
                 status_code=400,
                 detail=f"Недопустимое имя файла '{file.filename}'"
@@ -61,6 +72,7 @@ async def convert(
                 detail=f"Файл {file.filename} должен быть в формате .{expected_input}, а не .{ext}",
             )
 
+        # Конвертация 
         try:
             if conversion_type in {"png2jpg", "jpg2png", "png2webp", "jpg2webp", "webp2png", "webp2jpg"}:
                 result_bytes, out_ext = image_converter.convert_image(file, conversion_type)
@@ -78,13 +90,15 @@ async def convert(
         if not out_ext:
             out_ext = expected_output
 
-        final_filename = f"{base_name}.{out_ext}"
+        safe_name = safe_transliterate(base_name)
+        final_filename = f"{safe_name}.{out_ext}"
+
         results.append((final_filename, result_bytes))
 
-    # Если один файл — отдаём как обычный файл
+    # Если один файл: возвращаем напрямую
     if len(results) == 1:
         final_filename, content = results[0]
-        quoted_filename = urllib.parse.quote(final_filename)
+        quoted_filename = urllib.parse.quote(final_filename, safe="")
 
         media_types = {
             "png": "image/png",
@@ -95,6 +109,7 @@ async def convert(
             "woff": "font/woff",
             "woff2": "font/woff2",
         }
+
         media_type = media_types.get(final_filename.rsplit(".", 1)[-1].lower(), "application/octet-stream")
 
         return Response(
@@ -106,7 +121,7 @@ async def convert(
             },
         )
 
-    # Если файлов несколько — возвращаем JSON с информацией о файлах
+    # Несколько файлов: возвращаем JSON с информацией о файлах
     file_details = []
     for filename, content in results:
         file_id = str(uuid.uuid4())
@@ -130,7 +145,8 @@ async def download_file(file_id: str):
         raise HTTPException(status_code=404, detail="Файл не найден")
     
     filename, content = file_storage[file_id]
-    quoted_filename = urllib.parse.quote(filename)
+    safe_name = safe_transliterate(filename)
+    quoted_filename = urllib.parse.quote(safe_name, safe="")
     
     media_types = {
         "png": "image/png",
@@ -149,7 +165,7 @@ async def download_file(file_id: str):
         content=content,
         media_type=media_type,
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"; filename*=UTF-8\'\'{quoted_filename}',
+            "Content-Disposition": f'attachment; filename="{safe_name}"; filename*=UTF-8\'\'{quoted_filename}',
             "Content-Length": str(len(content))
         },
     )

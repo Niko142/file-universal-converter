@@ -3,3 +3,4 @@ uvicorn
 pillow
 fonttools
 python-multipart
+transliterate
