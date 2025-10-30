@@ -5,7 +5,7 @@ import {
   initSelectHandler,
   validateSelections,
 } from "./features/select-handler";
-import { convertFiles } from "./services/conversionService";
+import { convertFiles } from "./services/conversion.service";
 
 import "./style.css";
 
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       resultHandler.showResult(result);
     } catch (err) {
       await progressBar.hideProgress();
-      resultHandler.showError(`Ошибка: ${err.message}`);
+      resultHandler.showError(err.message);
     }
   };
 

@@ -50,7 +50,7 @@ async def convert(
     }
 
     if conversion_type not in allowed_conversions:
-        raise HTTPException(status_code=400, detail="Недопустимое преобразование форматов")
+        raise HTTPException(status_code=400, detail="Ошибка: Недопустимое преобразование форматов")
 
     expected_input, expected_output = allowed_conversions[conversion_type]
     results: list[tuple[str, bytes]] = []
@@ -62,14 +62,14 @@ async def convert(
         if not re.match(r'^[A-Za-z\u0400-\u04FF0-9_\-\.\s]+$', file.filename):
             raise HTTPException(
                 status_code=400,
-                detail=f"Недопустимое имя файла '{file.filename}'"
+                detail=f"Ошибка: недопустимое имя файла '{file.filename}'"
             )
 
         # Валидация расширения для каждого файла
         if ext and ext != expected_input:
             raise HTTPException(
                 status_code=400,
-                detail=f"Файл {file.filename} должен быть в формате .{expected_input}, а не .{ext}",
+                detail=f"Ошибка: файл {file.filename} должен быть в формате .{expected_input}, а не .{ext}",
             )
 
         # Конвертация 
@@ -81,7 +81,7 @@ async def convert(
             elif conversion_type in {"ttf2woff", "ttf2woff2"}:
                 result_bytes, out_ext = font_converter.convert_font(file, conversion_type)
             else:
-                raise HTTPException(status_code=400, detail="Неподдерживаемый тип конвертации")
+                raise HTTPException(status_code=400, detail="Ошибка: неподдерживаемый тип конвертации")
         except ValueError as e:
             raise HTTPException(status_code=400, detail=f"{file.filename}: {e}")
         except Exception as e:
@@ -180,7 +180,7 @@ async def download_zip(file_ids: list[str] = Form(...)):
     files_to_zip = []
     for file_id in file_ids:
         if file_id not in file_storage:
-            raise HTTPException(status_code=404, detail=f"Файл {file_id} не найден")
+            raise HTTPException(status_code=404, detail=f"Ошибка: файл {file_id} не найден")
         files_to_zip.append(file_storage[file_id])
     
     # Создаем ZIP

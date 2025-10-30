@@ -277,12 +277,16 @@ input[type="file"]::file-selector-button:hover {
 .error-message {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   width: fit-content;
   font-weight: 600;
   padding: 5px 10px;
   border-radius: 8px;
   border: 2px solid transparent;
+
+  & svg {
+    flex: none;
+  }
 }
 
 .success-message {

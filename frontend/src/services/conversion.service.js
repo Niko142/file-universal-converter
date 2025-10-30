@@ -73,22 +73,29 @@ const handleSingleFileResponse = async (response, progressBar) => {
 
 // Обработчик для конвертации файлов
 export const convertFiles = async (formData, progressBar = null) => {
-  const response = await fetch(`${API_BASE_URL}/convert`, {
-    method: "POST",
-    body: formData,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/convert`, {
+      method: "POST",
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.detail || response.status);
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.detail || response.status);
+    }
+
+    const contentType = response.headers.get("content-type");
+
+    // Если сервер вернул JSON, значит несколько файлов
+    return contentType?.includes("application/json")
+      ? handleMultipleResponse(response, progressBar)
+      : handleSingleFileResponse(response, progressBar);
+  } catch (err) {
+    if (err.name === "TypeError" && err.message.startsWith("Failed to fetch")) {
+      throw new Error("Не удалось подключиться к серверу. Попробуйте позже.");
+    }
+    throw err;
   }
-
-  const contentType = response.headers.get("content-type");
-
-  // Если сервер вернул JSON, значит несколько файлов
-  return contentType?.includes("application/json")
-    ? handleMultipleResponse(response, progressBar)
-    : handleSingleFileResponse(response, progressBar);
 };
 
 // Загрузка выбранного файла
